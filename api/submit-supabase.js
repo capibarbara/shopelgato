@@ -14,6 +14,7 @@ export default async function handler(req, res) {
 
     const body = { name, email, team, colors, quantity: quantity ? Number(quantity) : null, notes }
 
+    // Insert into Supabase
     const r = await fetch(`${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/submissions`, {
       method: 'POST',
       headers: {
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
 
     const inserted = result?.[0] || null
 
-    // Prepare to send email via SMTP if configured
+    // Send SMTP email if configured
     let email_debug = null
     const SMTP_USER = process.env.EMAIL_SMTP_USER
     const SMTP_PASS = process.env.EMAIL_SMTP_PASS
@@ -54,16 +55,36 @@ export default async function handler(req, res) {
           subject: `New design request — ${inserted.team}`,
           text
         })
-        email_debug = { success: true, info: info }
+        email_debug = { success: true, info }
       } catch (e) {
         console.error('SMTP send error', e)
-        email_debug = { success: false, error: (e && e.message) ? e.message : String(e), stack: (e && e.stack) ? e.stack : null }
+        email_debug = { success: false, error: (e && e.message) ? e.message : String(e) }
       }
     } else {
       email_debug = { success: false, error: 'SMTP not configured (missing env vars)' }
     }
 
-    if (_debug) return res.status(200).json({ ok: true, inserted: result, email_debug })
+    // Forward to Zapier webhook if configured
+    let webhook_debug = null
+    const ZAPIER_WEBHOOK_URL = process.env.ZAPIER_WEBHOOK_URL
+    if (ZAPIER_WEBHOOK_URL && inserted) {
+      try {
+        const whRes = await fetch(ZAPIER_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(inserted)
+        })
+        const whText = await whRes.text()
+        webhook_debug = { success: whRes.ok, status: whRes.status, body: whText }
+      } catch (e) {
+        console.error('Zapier webhook error', e)
+        webhook_debug = { success: false, error: (e && e.message) ? e.message : String(e) }
+      }
+    } else {
+      webhook_debug = { success: false, error: 'ZAPIER_WEBHOOK_URL not configured' }
+    }
+
+    if (_debug) return res.status(200).json({ ok: true, inserted: result, email_debug, webhook_debug })
 
     return res.status(200).json({ ok: true, inserted: result })
   } catch (err) {
