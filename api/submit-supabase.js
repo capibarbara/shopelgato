@@ -56,7 +56,11 @@ export default async function handler(req, res) {
       }
     }
 
-    return res.status(200).json({ ok: true, inserted: result })
+    // DEBUG: if _debug flag is provided in body, include email send status
+if (req.body && req.body._debug) {
+  return res.status(200).json({ ok: true, inserted: result, email_debug: 'See server logs for SMTP send details' })
+}
+return res.status(200).json({ ok: true, inserted: result })
   } catch (err) {
     console.error(err)
     return res.status(500).json({ error: 'Internal error' })
