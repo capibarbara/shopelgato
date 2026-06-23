@@ -26,6 +26,31 @@ export default async function handler(req, res) {
     const result = await r.json()
     if (!r.ok) return res.status(500).json({ error: 'Supabase insert failed', details: result })
 
+    const inserted = result?.[0] || null
+
+    // Optionally send email notification via SendGrid if configured
+    const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY
+    const OWNER_EMAIL = process.env.OWNER_EMAIL
+    if (SENDGRID_API_KEY && OWNER_EMAIL && inserted) {
+      try {
+        const msg = {
+          personalizations: [{ to: [{ email: OWNER_EMAIL }] }],
+          from: { email: 'no-reply@shopelgato.com', name: 'Shop El Gato' },
+          subject: `New design request — ${inserted.team}`,
+          content: [
+            { type: 'text/plain', value: `New request:\nName: ${inserted.name}\nEmail: ${inserted.email}\nTeam: ${inserted.team}\nColors: ${inserted.colors}\nQuantity: ${inserted.quantity}\nNotes: ${inserted.notes}\nSubmitted: ${inserted.created_at}` }
+          ]
+        }
+        await fetch('https://api.sendgrid.com/v3/mail/send', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${SENDGRID_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(msg)
+        })
+      } catch (e) {
+        console.error('SendGrid error', e)
+      }
+    }
+
     return res.status(200).json({ ok: true, inserted: result })
   } catch (err) {
     console.error(err)
