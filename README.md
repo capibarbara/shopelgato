@@ -1,0 +1,17 @@
+Shop El Gato — Local handcrafted team goods
+
+Quick start (local):
+1. Install Node.js (16+)
+2. In a terminal: cd C:\Users\barbaraa\shopelgato
+3. npm install
+4. npm run dev
+
+To deploy to Vercel:
+- Create a Vercel account and import the repo (build: npm run build, output: dist)
+- Follow deploy-instructions.md for forms and DB options
+
+Files created:
+- src/: React app
+- brand-guide.md, business-plan.md, deploy-instructions.md: docs
+
+If you want, provide a GitHub personal access token (repo scope) and I will push and create the GitHub repo for you.
