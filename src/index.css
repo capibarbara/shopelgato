@@ -1,0 +1,15 @@
+:root{
+  --yellow:#FFD400; --black:#000; --white:#fff;
+  font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+body{margin:0;background:var(--white);color:var(--black)}
+.page{max-width:900px;margin:0 auto;padding:24px}
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px}
+.logo{width:180px}
+.cta-row{display:flex;gap:12px;margin-top:12px}
+.btn{padding:10px 14px;border-radius:6px;text-decoration:none;border:2px solid var(--black);color:var(--black)}
+.btn.primary{background:var(--yellow)}
+.products .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:12px}
+.card{border:1px solid #eee;border-radius:8px;padding:12px}
+.small{font-size:0.9rem;color:#333}
+.site-footer{margin-top:30px;text-align:center;color:#555;font-size:0.9rem}
