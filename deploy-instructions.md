@@ -23,3 +23,10 @@ Vercel Postgres setup (quick):
 
 Security notes:
 - Keep the Postgres instance private; do not expose the DATABASE_URL publicly.
+Email notifications and admin API:
+- To enable email notifications on new submissions, add these environment variables in Vercel:
+  - SENDGRID_API_KEY = <your SendGrid API key>
+  - OWNER_EMAIL = <your email to receive notifications>
+- To access the admin submissions list, set:
+  - ADMIN_TOKEN = <secret string>
+Then redeploy. Access admin UI at https://your-site/admin and enter the ADMIN_TOKEN to view submissions.
