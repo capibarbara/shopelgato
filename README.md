@@ -14,4 +14,4 @@ Files created:
 - src/: React app
 - brand-guide.md, business-plan.md, deploy-instructions.md: docs
 
-If you want, provide a GitHub personal access token (repo scope) and I will push and create the GitHub repo for you.\n\n[deploy-trigger] Trigger redeploy by updating README
+If you want, provide a GitHub personal access token (repo scope) and I will push and create the GitHub repo for you.\n\n[deploy-trigger] Trigger redeploy by updating README\n[deploy-trigger-2]
