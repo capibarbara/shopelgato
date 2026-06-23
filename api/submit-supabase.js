@@ -1,3 +1,5 @@
+import nodemailer from 'nodemailer'
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   try {
@@ -28,26 +30,29 @@ export default async function handler(req, res) {
 
     const inserted = result?.[0] || null
 
-    // Optionally send email notification via SendGrid if configured
-    const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY
+    const SMTP_USER = process.env.EMAIL_SMTP_USER
+    const SMTP_PASS = process.env.EMAIL_SMTP_PASS
     const OWNER_EMAIL = process.env.OWNER_EMAIL
-    if (SENDGRID_API_KEY && OWNER_EMAIL && inserted) {
+
+    if (SMTP_USER && SMTP_PASS && OWNER_EMAIL && inserted) {
       try {
-        const msg = {
-          personalizations: [{ to: [{ email: OWNER_EMAIL }] }],
-          from: { email: 'no-reply@shopelgato.com', name: 'Shop El Gato' },
+        const transporter = nodemailer.createTransport({
+          host: 'smtp.office365.com',
+          port: 587,
+          secure: false,
+          auth: { user: SMTP_USER, pass: SMTP_PASS }
+        })
+
+        const text = `New request:\nName: ${inserted.name}\nEmail: ${inserted.email}\nTeam: ${inserted.team}\nColors: ${inserted.colors}\nQuantity: ${inserted.quantity}\nNotes: ${inserted.notes}\nSubmitted: ${inserted.created_at}`
+
+        await transporter.sendMail({
+          from: `Shop El Gato <${SMTP_USER}>`,
+          to: OWNER_EMAIL,
           subject: `New design request — ${inserted.team}`,
-          content: [
-            { type: 'text/plain', value: `New request:\nName: ${inserted.name}\nEmail: ${inserted.email}\nTeam: ${inserted.team}\nColors: ${inserted.colors}\nQuantity: ${inserted.quantity}\nNotes: ${inserted.notes}\nSubmitted: ${inserted.created_at}` }
-          ]
-        }
-        await fetch('https://api.sendgrid.com/v3/mail/send', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${SENDGRID_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify(msg)
+          text
         })
       } catch (e) {
-        console.error('SendGrid error', e)
+        console.error('SMTP send error', e)
       }
     }
 
