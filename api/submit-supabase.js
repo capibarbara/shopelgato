@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer'
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   try {
-    const { name, email, team, colors, quantity, notes } = req.body || {}
+    const { name, email, team, colors, quantity, notes, _debug } = req.body || {}
     if (!name || !team) return res.status(400).json({ error: 'name and team are required' })
 
     const SUPABASE_URL = process.env.SUPABASE_URL
@@ -30,6 +30,8 @@ export default async function handler(req, res) {
 
     const inserted = result?.[0] || null
 
+    // Prepare to send email via SMTP if configured
+    let email_debug = null
     const SMTP_USER = process.env.EMAIL_SMTP_USER
     const SMTP_PASS = process.env.EMAIL_SMTP_PASS
     const OWNER_EMAIL = process.env.OWNER_EMAIL
@@ -40,27 +42,30 @@ export default async function handler(req, res) {
           host: 'smtp.office365.com',
           port: 587,
           secure: false,
-          auth: { user: SMTP_USER, pass: SMTP_PASS }
+          auth: { user: SMTP_USER, pass: SMTP_PASS },
+          tls: { ciphers: 'TLSv1.2', rejectUnauthorized: false }
         })
 
         const text = `New request:\nName: ${inserted.name}\nEmail: ${inserted.email}\nTeam: ${inserted.team}\nColors: ${inserted.colors}\nQuantity: ${inserted.quantity}\nNotes: ${inserted.notes}\nSubmitted: ${inserted.created_at}`
 
-        await transporter.sendMail({
+        const info = await transporter.sendMail({
           from: `Shop El Gato <${SMTP_USER}>`,
           to: OWNER_EMAIL,
           subject: `New design request — ${inserted.team}`,
           text
         })
+        email_debug = { success: true, info: info }
       } catch (e) {
         console.error('SMTP send error', e)
+        email_debug = { success: false, error: (e && e.message) ? e.message : String(e), stack: (e && e.stack) ? e.stack : null }
       }
+    } else {
+      email_debug = { success: false, error: 'SMTP not configured (missing env vars)' }
     }
 
-    // DEBUG: if _debug flag is provided in body, include email send status
-if (req.body && req.body._debug) {
-  return res.status(200).json({ ok: true, inserted: result, email_debug: 'See server logs for SMTP send details' })
-}
-return res.status(200).json({ ok: true, inserted: result })
+    if (_debug) return res.status(200).json({ ok: true, inserted: result, email_debug })
+
+    return res.status(200).json({ ok: true, inserted: result })
   } catch (err) {
     console.error(err)
     return res.status(500).json({ error: 'Internal error' })
