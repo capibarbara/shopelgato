@@ -12,3 +12,14 @@ Forms & requests:
 Notes for non-technical owners:
 - I can deploy for you if you provide GitHub PAT and confirm the GitHub repo name and visibility.
 - After deploy, share the Vercel project link and domain to test ordering workflow.
+Vercel Postgres setup (quick):
+1. In Vercel Dashboard, go to Integrations → Postgres and create a new Postgres database (Free tier available).
+2. After provisioning, in the Vercel Project Settings > Integrations attach the Postgres instance to the shopelgato project so Vercel injects DATABASE_URL into the project env.
+3. Run the migration SQL in the Vercel Postgres Console or using psql:
+   - Console: open the database in Vercel and run the SQL in the SQL editor.
+   - psql: connect using the DATABASE_URL and run migrations/001_create_submissions.sql
+4. Deploy: Vercel will install @vercel/postgres during build. The serverless function /api/submit-postgres will be able to connect using the integration.
+5. Update the site contact form to POST to /api/submit-postgres with JSON: { name, email, team, colors, quantity, notes }
+
+Security notes:
+- Keep the Postgres instance private; do not expose the DATABASE_URL publicly.
