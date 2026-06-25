@@ -80,13 +80,7 @@ function ContactForm(){
   function validateEmail(email) {
     return /\S+@\S+\.\S+/.test(email)
   }
-  function validatePhone(phone) {
-    // allow digits, spaces, +, -, parentheses; require 7-20 chars
-    return /^[0-9()+\-\s]{7,20}$/.test(phone)
-  }
-  function normalizePhone(phone){
-    return phone.replace(/[^0-9+]/g, '')
-  }
+  function validatePhone(phone) {\n    // Accept common US and international formats by counting digits after removing non-digits\n    const digits = (phone || '').replace(/\\D/g, '');\n    // Accept typical 10-digit US numbers or international numbers up to 15 digits\n    return digits.length === 10 || (digits.length >= 10 && digits.length <= 15);\n  }\n  function normalizePhone(phone){\n    // Preserve leading + if present, store digits only otherwise\n    const s = (phone || '').trim();\n    const leadingPlus = s.startsWith('+') ? '+' : '';\n    const digits = s.replace(/\\D/g, '');\n    return leadingPlus ? leadingPlus + digits : digits;\n  }
 
   async function submit(e){
     e.preventDefault()
