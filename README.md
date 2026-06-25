@@ -18,3 +18,4 @@ If you want, provide a GitHub personal access token (repo scope) and I will push
 [ci] require email+phone on contact form
 [ci] client validation & logo update
 [ci] relax phone validation
+[ci] fix phone validation syntax
