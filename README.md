@@ -19,3 +19,4 @@ If you want, provide a GitHub personal access token (repo scope) and I will push
 [ci] client validation & logo update
 [ci] relax phone validation
 [ci] fix phone validation syntax
+[ci] fix phone newlines
