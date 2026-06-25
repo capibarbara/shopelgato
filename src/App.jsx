@@ -2,18 +2,13 @@ import React, { useState } from 'react'
 import Logo from './logo.svg'
 
 export default function App(){
-  const products = [
-    {id:1, name:'Team Bracelet', price:'$10', desc:'Hand-knotted, team colors'},
-    {id:2, name:'Custom Bag', price:'$28', desc:'Canvas, printed name'},
-    {id:3, name:'Keychain', price:'$6', desc:'Acrylic, team logo'}
-  ]
-
   return (
     <div className="page">
       <header className="hero">
         <img src={Logo} alt="Shop El Gato logo" className="logo"/>
-        <h1>shop el gato</h1>
-        <p className="tag">Handcrafted for your hometown — free custom designs</p>
+        <h1>Shop El Gato</h1>
+        <p className="tag">Custom Gear for Teams That Play to Win</p>
+        <p>At Shop El Gato, we bring your team vision to life. From the field to the stands, we specialize in high-quality custom items designed to make your team stand out.</p>
         <div className="cta-row">
           <a className="btn primary" href="#contact">Request a free design</a>
           <a className="btn" href="#products">See products</a>
@@ -21,27 +16,41 @@ export default function App(){
       </header>
 
       <section id="products" className="products">
-        <h2>Featured items</h2>
-        <div className="grid">
-          {products.map(p=>(
-            <div key={p.id} className="card">
-              <div className="card-body">
-                <h3>{p.name}</h3>
-                <p className="desc">{p.desc}</p>
-                <p className="price">{p.price} — cash on delivery</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <h2>What We Offer</h2>
+        <ul>
+          <li>Custom Bags</li>
+          <li>Custom Bracelets</li>
+          <li>Apparel and Team Gear</li>
+          <li>Sublimation Printing (full color, vibrant designs)</li>
+          <li>Vinyl Designs</li>
+          <li>Single-Color Screen Printing</li>
+          <li>Embroidery</li>
+        </ul>
+      </section>
+
+      <section id="design" className="design-services">
+        <h2>Design Services</h2>
+        <ul>
+          <li>Custom design services available for a small fee</li>
+          <li>Mockups provided for approval before production begins</li>
+          <li>We work with you until your design is ready</li>
+        </ul>
       </section>
 
       <section id="how" className="how">
-        <h2>How ordering works</h2>
+        <h2>How It Works</h2>
         <ol>
-          <li>Reach out and request a free design</li>
-          <li>Approve the mockup</li>
-          <li>We make it and deliver locally — pay cash on delivery</li>
+          <li>Submit your idea or request</li>
+          <li>Receive your custom mockup</li>
+          <li>Approve your design</li>
+          <li>Payment is collected</li>
+          <li>Production begins</li>
         </ol>
+      </section>
+
+      <section id="payment" className="payment">
+        <h2>Payment Options</h2>
+        <p>We accept: Venmo, Zelle, Cash. Full payment is required after mockup approval to begin production.</p>
       </section>
 
       <section id="contact" className="contact">
