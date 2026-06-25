@@ -6,7 +6,6 @@ async function getGraphAccessTokenFromRefresh(refreshToken) {
   params.append('client_secret', process.env.MS_CLIENT_SECRET)
   params.append('grant_type', 'refresh_token')
   params.append('refresh_token', refreshToken)
-  // scope not required for refresh with MS identity platform
 
   const resp = await fetch(`https://login.microsoftonline.com/common/oauth2/v2.0/token`, {
     method: 'POST',
@@ -46,8 +45,8 @@ async function sendMailViaGraph(accessToken, ownerEmail, subject, text) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   try {
-    const { name, email, team, colors, quantity, notes, _debug } = req.body || {}
-    if (!name || !team) return res.status(400).json({ error: 'name and team are required' })
+    const { name, email, phone, team, colors, quantity, notes, _debug } = req.body || {}
+    if (!name || !team || !email || !phone) return res.status(400).json({ error: 'name, team, email, and phone are required' })
 
     const SUPABASE_URL = process.env.SUPABASE_URL
     const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -55,7 +54,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Supabase not configured' })
     }
 
-    const body = { name, email, team, colors, quantity: quantity ? Number(quantity) : null, notes }
+    const body = { name, email, phone, team, colors, quantity: quantity ? Number(quantity) : null, notes }
 
     // Insert into Supabase
     const r = await fetch(`${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/submissions`, {
@@ -82,7 +81,7 @@ export default async function handler(req, res) {
     if (MS_REFRESH_TOKEN && OWNER_EMAIL && inserted) {
       try {
         const access = await getGraphAccessTokenFromRefresh(MS_REFRESH_TOKEN)
-        const text = `New request:\nName: ${inserted.name}\nEmail: ${inserted.email}\nTeam: ${inserted.team}\nColors: ${inserted.colors}\nQuantity: ${inserted.quantity}\nNotes: ${inserted.notes}\nSubmitted: ${inserted.created_at}`
+        const text = `New request:\nName: ${inserted.name}\nEmail: ${inserted.email}\nPhone: ${inserted.phone}\nTeam: ${inserted.team}\nColors: ${inserted.colors}\nQuantity: ${inserted.quantity}\nNotes: ${inserted.notes}\nSubmitted: ${inserted.created_at}`
         await sendMailViaGraph(access, OWNER_EMAIL, `New design request — ${inserted.team}`, text)
         graph_debug = { success: true }
       } catch (e) {
@@ -108,7 +107,7 @@ export default async function handler(req, res) {
           tls: { ciphers: 'TLSv1.2', rejectUnauthorized: false }
         })
 
-        const text = `New request:\nName: ${inserted.name}\nEmail: ${inserted.email}\nTeam: ${inserted.team}\nColors: ${inserted.colors}\nQuantity: ${inserted.quantity}\nNotes: ${inserted.notes}\nSubmitted: ${inserted.created_at}`
+        const text = `New request:\nName: ${inserted.name}\nEmail: ${inserted.email}\nPhone: ${inserted.phone}\nTeam: ${inserted.team}\nColors: ${inserted.colors}\nQuantity: ${inserted.quantity}\nNotes: ${inserted.notes}\nSubmitted: ${inserted.created_at}`
 
         const info = await transporter.sendMail({
           from: `Shop El Gato <${SMTP_USER}>`,
