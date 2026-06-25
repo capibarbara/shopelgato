@@ -1,0 +1,1 @@
+-- Add phone column to submissions\nALTER TABLE IF EXISTS submissions ADD COLUMN phone text;\n
