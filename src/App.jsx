@@ -77,16 +77,32 @@ function ContactForm(){
     setForm(prev => ({ ...prev, [name]: value }))
   }
 
+  function validateEmail(email) {
+    return /\S+@\S+\.\S+/.test(email)
+  }
+  function validatePhone(phone) {
+    // allow digits, spaces, +, -, parentheses; require 7-20 chars
+    return /^[0-9()+\-\s]{7,20}$/.test(phone)
+  }
+  function normalizePhone(phone){
+    return phone.replace(/[^0-9+]/g, '')
+  }
+
   async function submit(e){
     e.preventDefault()
     setStatus(null)
     if (!form.name || !form.team || !form.email || !form.phone) { setStatus({ error: 'Please provide name, team, email, and phone.' }); return }
+    if (!validateEmail(form.email)) { setStatus({ error: 'Please enter a valid email address.' }); return }
+    if (!validatePhone(form.phone)) { setStatus({ error: 'Please enter a valid phone number (digits, +, - allowed).' }); return }
+
+    const payload = { ...form, phone: normalizePhone(form.phone) }
+
     setLoading(true)
     try {
       const res = await fetch('/api/submit-supabase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(payload)
       })
       const data = await res.json()
       if (res.ok) {
@@ -104,8 +120,8 @@ function ContactForm(){
     <form onSubmit={submit} style={{maxWidth:540, margin:'0 auto'}}>
       <div style={{display:'grid', gap:8}}>
         <input name="name" placeholder="Your name" value={form.name} onChange={update} />
-        <input name="email" placeholder="Email" value={form.email} onChange={update} />
-        <input name="phone" placeholder="Phone number (required)" value={form.phone} onChange={update} />
+        <input name="email" type="email" placeholder="Email" value={form.email} onChange={update} />
+        <input name="phone" type="tel" inputMode="tel" placeholder="Phone number (required)" value={form.phone} onChange={update} />
         <input name="team" placeholder="Team or group name" value={form.team} onChange={update} />
         <input name="colors" placeholder="Team colors (e.g., yellow/black)" value={form.colors} onChange={update} />
         <input name="quantity" type="number" placeholder="Quantity" value={form.quantity} onChange={update} />
