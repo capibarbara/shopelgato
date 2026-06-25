@@ -68,7 +68,7 @@ export default function App(){
 }
 
 function ContactForm(){
-  const [form, setForm] = useState({name:'', email:'', team:'', colors:'', quantity:'', notes:''})
+  const [form, setForm] = useState({name:'', email:'', phone:'', team:'', colors:'', quantity:'', notes:''})
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -80,7 +80,7 @@ function ContactForm(){
   async function submit(e){
     e.preventDefault()
     setStatus(null)
-    if (!form.name || !form.team) { setStatus({ error: 'Please provide your name and team.' }); return }
+    if (!form.name || !form.team || !form.email || !form.phone) { setStatus({ error: 'Please provide name, team, email, and phone.' }); return }
     setLoading(true)
     try {
       const res = await fetch('/api/submit-supabase', {
@@ -91,7 +91,7 @@ function ContactForm(){
       const data = await res.json()
       if (res.ok) {
         setStatus({ ok: 'Thanks! Your request was submitted. We will send a mockup.' })
-        setForm({name:'', email:'', team:'', colors:'', quantity:'', notes:''})
+        setForm({name:'', email:'', phone:'', team:'', colors:'', quantity:'', notes:''})
       } else {
         setStatus({ error: data.error || 'Submission failed. Try again.' })
       }
@@ -104,7 +104,8 @@ function ContactForm(){
     <form onSubmit={submit} style={{maxWidth:540, margin:'0 auto'}}>
       <div style={{display:'grid', gap:8}}>
         <input name="name" placeholder="Your name" value={form.name} onChange={update} />
-        <input name="email" placeholder="Email (optional)" value={form.email} onChange={update} />
+        <input name="email" placeholder="Email" value={form.email} onChange={update} />
+        <input name="phone" placeholder="Phone number (required)" value={form.phone} onChange={update} />
         <input name="team" placeholder="Team or group name" value={form.team} onChange={update} />
         <input name="colors" placeholder="Team colors (e.g., yellow/black)" value={form.colors} onChange={update} />
         <input name="quantity" type="number" placeholder="Quantity" value={form.quantity} onChange={update} />
