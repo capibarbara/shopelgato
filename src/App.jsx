@@ -80,9 +80,7 @@ function ContactForm(){
   function validateEmail(email) {
     return /\S+@\S+\.\S+/.test(email)
   }
-  function validatePhone(phone) {\n    // Accept common US and international formats by counting digits after removing non-digits\n    const digits = (phone || '').replace(/\\D/g, '');\n    // Accept typical 10-digit US numbers or international numbers up to 15 digits\n    return digits.length === 10 || (digits.length >= 10 && digits.length <= 15);\n  }\n  function normalizePhone(phone){\n    // Preserve leading + if present, store digits only otherwise\n    const s = (phone || '').trim();\n    const leadingPlus = s.startsWith('+') ? '+' : '';\n    const digits = s.replace(/\\D/g, '');\n    return leadingPlus ? leadingPlus + digits : digits;\n  }
-
-  async function submit(e){
+  function validatePhone(phone) {\n  // Accept common US and international formats by counting digits after removing non-digits\n  const digits = (phone || '').replace(/\\D/g, '');\n  // Accept typical 10-digit US numbers or international numbers up to 15 digits\n  return digits.length === 10 || (digits.length >= 10 && digits.length <= 15);\n}\nfunction normalizePhone(phone){\n  // Preserve leading + if present, store digits only otherwise\n  const s = (phone || '').trim();\n  const leadingPlus = s.startsWith('+') ? '+' : '';\n  const digits = s.replace(/\\D/g, '');\n  return leadingPlus ? leadingPlus + digits : digits;\n}\n\n  async function submit(e){
     e.preventDefault()
     setStatus(null)
     if (!form.name || !form.team || !form.email || !form.phone) { setStatus({ error: 'Please provide name, team, email, and phone.' }); return }
